@@ -3,6 +3,7 @@
 const fs = require("node:fs/promises");
 const path = require("node:path");
 const os = require("node:os");
+const readline = require("node:readline/promises");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SKILLS_SOURCE_DIR = path.join(REPO_ROOT, "skills");
@@ -21,7 +22,7 @@ Commands:
 
 Options:
   --dest <path>          Custom destination directory.
-  --force                Overwrite destination if a skill already exists.
+  --force                Overwrite destination if a skill already exists (no prompt).
   -h, --help             Show this help.
 `);
 }
@@ -112,6 +113,33 @@ async function listSkills() {
   }
 }
 
+async function confirmOverwrite(name, targetPath) {
+  if (!process.stdin.isTTY || !process.stdout.isTTY) {
+    throw new Error(
+      `Destination already exists for "${name}": ${targetPath} (non-interactive mode, use --force to overwrite)`
+    );
+  }
+
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  try {
+    const answer = (
+      await rl.question(
+        `Skill "${name}" already exists at ${targetPath}. Overwrite it? [y/N] `
+      )
+    )
+      .trim()
+      .toLowerCase();
+
+    return answer === "y" || answer === "yes";
+  } finally {
+    rl.close();
+  }
+}
+
 async function installSkills(rawArgs) {
   const parsed = parseInstallArgs(rawArgs);
   if (parsed.help) {
@@ -137,13 +165,16 @@ async function installSkills(rawArgs) {
     const to = path.join(parsed.dest, name);
     const exists = await dirExists(to);
 
-    if (exists && !parsed.force) {
-      throw new Error(
-        `Destination already exists for "${name}": ${to} (use --force to overwrite)`
-      );
+    if (exists && parsed.force) {
+      await fs.rm(to, { recursive: true, force: true });
     }
 
-    if (exists && parsed.force) {
+    if (exists && !parsed.force) {
+      const shouldOverwrite = await confirmOverwrite(name, to);
+      if (!shouldOverwrite) {
+        console.log(`Skipped "${name}" (kept existing skill).`);
+        continue;
+      }
       await fs.rm(to, { recursive: true, force: true });
     }
 

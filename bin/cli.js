@@ -6,7 +6,7 @@ const os = require("node:os");
 
 const REPO_ROOT = path.resolve(__dirname, "..");
 const SKILLS_SOURCE_DIR = path.join(REPO_ROOT, "skills");
-const DEFAULT_DEST = path.join(os.homedir(), ".codex", "skills");
+const DEFAULT_DEST = path.join(os.homedir(), ".agent", "skills");
 
 function printHelp() {
   console.log(`agent-skill-installer
@@ -17,7 +17,7 @@ Usage:
 
 Commands:
   list                   List installable skills in this package.
-  install <skill...>     Install one or more skills to ~/.codex/skills by default.
+  install <skill...>     Install one or more skills to ~/.agent/skills by default.
 
 Options:
   --dest <path>          Custom destination directory.

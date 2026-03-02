@@ -25,14 +25,14 @@
 # 查看可安装 skills
 npx agent-skill-installer list
 
-# 安装一个 skill（默认安装到 ~/.agent/skills）
+# 安装一个 skill（默认安装到 ~/.agents/skills）
 npx agent-skill-installer install git-commit-helper
 
 # 一次安装多个 skills
 npx agent-skill-installer install git-commit-helper codex-session-daily-report
 
 # 安装到自定义目录
-npx agent-skill-installer install git-commit-helper --dest ~/.agent/skills
+npx agent-skill-installer install git-commit-helper --dest ~/.codex/skills
 
 # 覆盖已存在 skill
 npx agent-skill-installer install git-commit-helper --force

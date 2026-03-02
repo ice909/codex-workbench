@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit Helper"
+  short_description: "Generate Chinese Git commit messages with strict checks"
+  default_prompt: "Use $git-commit-helper to draft a Chinese commit message and validate it before committing as codex <codex-ice@gmail.com>."

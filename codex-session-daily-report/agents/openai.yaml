@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Session Daily Report"
+  short_description: "Generate daily reports from Codex session history."
+  default_prompt: "Use $codex-session-daily-report to read today's Codex sessions and output a concise daily report."

@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+"""Validate commit message for git-commit-helper skill rules."""
+
+from __future__ import annotations
+
+import argparse
+import re
+import sys
+from pathlib import Path
+
+ALLOWED_TYPES = ("feat", "fix", "refactor", "perf", "style", "test", "docs", "chore")
+HEADER_RE = re.compile(
+    r"^(?P<type>feat|fix|refactor|perf|style|test|docs|chore)"
+    r"\((?P<scope>[a-z0-9][a-z0-9-]*)\): (?P<summary>.+)$"
+)
+CJK_RE = re.compile(r"[\u4e00-\u9fff]")
+FORBIDDEN_SUMMARY_PATTERNS = (
+    re.compile(r"\band\b", re.IGNORECASE),
+    re.compile(r"&"),
+    re.compile(r"multiple changes", re.IGNORECASE),
+)
+FORBIDDEN_ENDINGS = (".", "。")
+MAX_SUMMARY_LEN = 50
+
+
+def load_message(args: argparse.Namespace) -> str:
+    if args.message and args.file:
+        raise ValueError("--message 与 --file 只能二选一")
+    if not args.message and not args.file:
+        raise ValueError("必须提供 --message 或 --file")
+
+    if args.message:
+        return args.message
+
+    content = Path(args.file).read_text(encoding="utf-8")
+    return content.rstrip("\n")
+
+
+def validate_commit_message(message: str) -> list[str]:
+    errors: list[str] = []
+    lines = message.splitlines()
+
+    if not lines:
+        return ["提交信息不能为空"]
+
+    header = lines[0].strip()
+    if not header:
+        return ["提交首行不能为空"]
+
+    match = HEADER_RE.match(header)
+    commit_type = None
+    summary = ""
+    if not match:
+        errors.append("首行格式必须为 <type>(<scope>): <summary>")
+    else:
+        commit_type = match.group("type")
+        summary = match.group("summary").strip()
+
+    if len(lines) > 1 and lines[1] != "":
+        errors.append("若包含正文，第 2 行必须为空行")
+
+    body = "\n".join(lines[2:]).strip() if len(lines) > 2 else ""
+
+    if commit_type and commit_type not in ALLOWED_TYPES:
+        errors.append("type 必须是 feat/fix/refactor/perf/style/test/docs/chore 之一")
+
+    if summary:
+        if len(summary) > MAX_SUMMARY_LEN:
+            errors.append("summary 长度不能超过 50 字符")
+        if summary.endswith(FORBIDDEN_ENDINGS):
+            errors.append("summary 结尾不能使用句号")
+        if not CJK_RE.search(summary):
+            errors.append("summary 必须使用中文")
+
+        for pattern in FORBIDDEN_SUMMARY_PATTERNS:
+            if pattern.search(summary):
+                errors.append("summary 不能包含 and / & / multiple changes")
+                break
+
+    if body and not CJK_RE.search(body):
+        errors.append("正文需使用中文")
+
+    if commit_type == "perf" and not body:
+        errors.append("perf 类型必须提供正文说明优化原因")
+
+    return errors
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="校验提交信息是否符合 git-commit-helper 规则",
+    )
+    parser.add_argument("--message", help="直接传入提交信息文本")
+    parser.add_argument("--file", help="从文件读取提交信息")
+    args = parser.parse_args()
+
+    try:
+        message = load_message(args)
+    except Exception as exc:  # noqa: BLE001
+        print(f"参数错误: {exc}")
+        return 2
+
+    errors = validate_commit_message(message)
+    if errors:
+        print("校验失败:")
+        for idx, err in enumerate(errors, start=1):
+            print(f"{idx}. {err}")
+        return 1
+
+    print("校验通过")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

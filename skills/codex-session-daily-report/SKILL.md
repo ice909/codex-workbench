@@ -3,8 +3,6 @@ name: codex-session-daily-report
 description: Read Codex session files for a target date, summarize completed work from assistant final answers, and produce a concise daily report. Use when the user asks to summarize today's Codex activity, generate a daily report from `~/.codex/sessions`, or review completed outcomes across sessions.
 ---
 
-# Codex Session Daily Report
-
 Produce a daily report from local Codex sessions.
 
 ## Workflow

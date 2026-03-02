@@ -3,10 +3,6 @@ name: git-commit-helper
 description: "严格生成与校验中文 Git 提交信息，固定格式为 type(scope): summary，type 仅允许 feat/fix/refactor/perf/style/test/docs/chore，summary 必须用祈使句、不超过 50 字符、不得以句号结尾且不得包含 and/&/multiple changes。使用该技能于编写提交说明、检查提交文本是否合规，或执行使用 codex (codex-ice@gmail.com) 身份的提交时。"
 ---
 
-# Git Commit Helper
-
-## 概览
-
 按固定规范生成中文提交信息，并在提交前进行格式校验。
 统一使用作者身份：`codex <codex-ice@gmail.com>`。
 

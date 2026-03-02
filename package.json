@@ -1,6 +1,6 @@
 {
   "name": "agent-skill-installer",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Install one or more Codex skills from this package via npx.",
   "bin": {
     "agent-skill-installer": "bin/cli.js"

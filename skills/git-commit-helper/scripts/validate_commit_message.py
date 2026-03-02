@@ -19,6 +19,18 @@ FORBIDDEN_SUMMARY_PATTERNS = (
     re.compile(r"&"),
     re.compile(r"multiple changes", re.IGNORECASE),
 )
+PAST_TENSE_PREFIXES = (
+    "已",
+    "已经",
+    "完成",
+    "修复了",
+    "新增了",
+    "优化了",
+    "更新了",
+    "重构了",
+    "添加了",
+    "改了",
+)
 FORBIDDEN_ENDINGS = (".", "。")
 MAX_SUMMARY_LEN = 50
 
@@ -49,36 +61,50 @@ def validate_commit_message(message: str) -> list[str]:
 
     match = HEADER_RE.match(header)
     commit_type = None
+    raw_summary = ""
     summary = ""
     if not match:
         errors.append("首行格式必须为 <type>(<scope>): <summary>")
     else:
         commit_type = match.group("type")
-        summary = match.group("summary").strip()
+        raw_summary = match.group("summary")
+        summary = raw_summary.strip()
 
     if len(lines) > 1 and lines[1] != "":
         errors.append("若包含正文，第 2 行必须为空行")
 
-    body = "\n".join(lines[2:]).strip() if len(lines) > 2 else ""
+    body_lines = lines[2:] if len(lines) > 2 else []
+    body = "\n".join(body_lines).strip()
 
     if commit_type and commit_type not in ALLOWED_TYPES:
         errors.append("type 必须是 feat/fix/refactor/perf/style/test/docs/chore 之一")
 
+    if not summary and match:
+        errors.append("summary 不能为空")
+
     if summary:
+        if raw_summary != summary:
+            errors.append("summary 前后不能有空格")
         if len(summary) > MAX_SUMMARY_LEN:
             errors.append("summary 长度不能超过 50 字符")
         if summary.endswith(FORBIDDEN_ENDINGS):
             errors.append("summary 结尾不能使用句号")
         if not CJK_RE.search(summary):
             errors.append("summary 必须使用中文")
+        if summary.startswith(PAST_TENSE_PREFIXES):
+            errors.append("summary 必须使用祈使句，避免使用“已/完成/xxx了”开头")
 
         for pattern in FORBIDDEN_SUMMARY_PATTERNS:
             if pattern.search(summary):
                 errors.append("summary 不能包含 and / & / multiple changes")
                 break
 
-    if body and not CJK_RE.search(body):
-        errors.append("正文需使用中文")
+    for line_no, line in enumerate(body_lines, start=3):
+        stripped = line.strip()
+        if not stripped:
+            continue
+        if not CJK_RE.search(stripped):
+            errors.append(f"正文第 {line_no} 行需使用中文")
 
     if commit_type == "perf" and not body:
         errors.append("perf 类型必须提供正文说明优化原因")

@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-03-03T00:00:00Z",
+  "repo": "ice909/codex-workbench",
+  "branch": "main",
+  "skills": [
+    {
+      "name": "codex-session-daily-report",
+      "path": "skills/codex-session-daily-report",
+      "description": "Read Codex session files for a target date and generate a concise daily report.",
+      "files": [
+        "SKILL.md",
+        "agents/openai.yaml"
+      ]
+    },
+    {
+      "name": "git-commit-helper",
+      "path": "skills/git-commit-helper",
+      "description": "Generate and validate Chinese Git commit messages in a strict format.",
+      "files": [
+        "SKILL.md",
+        "agents/openai.yaml",
+        "scripts/validate_commit_message.py"
+      ]
+    }
+  ]
+}

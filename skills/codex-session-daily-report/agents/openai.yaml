@@ -1,4 +1,4 @@
 interface:
   display_name: "codex-session-daily-report"
-  short_description: "Summarize Codex final answers into a daily report"
-  default_prompt: "Use $codex-session-daily-report to resolve a concrete target date, extract assistant final_answer entries from ~/.codex/sessions, and output a concise factual daily report."
+  short_description: "Generate daily reports from Codex session history."
+  default_prompt: "Use $codex-session-daily-report to read today's Codex sessions and output a concise daily report."

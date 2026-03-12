@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -33,6 +34,8 @@ PAST_TENSE_PREFIXES = (
 )
 FORBIDDEN_ENDINGS = (".", "。")
 MAX_SUMMARY_LEN = 50
+AUTHOR_NAME = "codex"
+AUTHOR_EMAIL = "codex-ice@gmail.com"
 
 
 def load_message(args: argparse.Namespace) -> str:
@@ -112,12 +115,29 @@ def validate_commit_message(message: str) -> list[str]:
     return errors
 
 
+def commit_message(message: str) -> int:
+    cmd = [
+        "git",
+        "-c",
+        f"user.name={AUTHOR_NAME}",
+        "-c",
+        f"user.email={AUTHOR_EMAIL}",
+        "commit",
+        "--cleanup=verbatim",
+        "-F",
+        "-",
+    ]
+    result = subprocess.run(cmd, input=message, text=True, check=False)
+    return result.returncode
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="校验提交信息是否符合 git-commit-helper 规则",
     )
     parser.add_argument("--message", help="直接传入提交信息文本")
     parser.add_argument("--file", help="从文件读取提交信息")
+    parser.add_argument("--commit", action="store_true", help="校验通过后直接提交")
     args = parser.parse_args()
 
     try:
@@ -132,6 +152,9 @@ def main() -> int:
         for idx, err in enumerate(errors, start=1):
             print(f"{idx}. {err}")
         return 1
+
+    if args.commit:
+        return commit_message(message)
 
     print("校验通过")
     return 0

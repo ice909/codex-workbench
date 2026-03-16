@@ -1,4 +1,4 @@
 interface:
   display_name: "git-commit-helper"
-  short_description: "严格生成中文 Git 提交信息，默认直接提交"
-  default_prompt: "Use $git-commit-helper. Inspect staged changes first and choose type by outcome, not habit: use `feat` for new capabilities, new routes, new commands, new options, new UI or new API behavior; use `fix` only when restoring broken existing behavior with clear bug evidence. Never default to `fix`. Do not run the validator by default. Commit directly as codex <codex-ice@gmail.com> with `git commit -m`. If staged changes are large, or type is `perf`, include a Chinese body with a second `-m` explaining background, scope, risk, or optimization reason."
+  short_description: "快速单行中文 Git 提交"
+  default_prompt: "Use $git-commit-helper. Inspect staged changes first and choose type by outcome, not habit: use `feat` for new capabilities, new routes, new commands, new options, new UI or new API behavior; use `fix` only when restoring broken existing behavior with clear bug evidence. Never default to `fix`. Do not run the validator by default. Commit directly as codex <codex-ice@gmail.com> with exactly one `git commit -m \"<type>(<scope>): <summary>\"`. Do not write a body, do not use a second `-m`, and do not embed `\\n` in the message string because Git will keep it literally."

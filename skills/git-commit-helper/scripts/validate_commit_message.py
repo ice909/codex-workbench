@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate commit message for git-commit-helper skill rules."""
+"""Validate single-line commit message for git-commit-helper skill rules."""
 
 from __future__ import annotations
 
@@ -73,11 +73,8 @@ def validate_commit_message(message: str) -> list[str]:
         raw_summary = match.group("summary")
         summary = raw_summary.strip()
 
-    if len(lines) > 1 and lines[1] != "":
-        errors.append("若包含正文，第 2 行必须为空行")
-
-    body_lines = lines[2:] if len(lines) > 2 else []
-    body = "\n".join(body_lines).strip()
+    if len(lines) > 1:
+        errors.append("当前规则仅允许单行提交信息，不要编写正文")
 
     if commit_type and commit_type not in ALLOWED_TYPES:
         errors.append("type 必须是 feat/fix/refactor/perf/style/test/docs/chore 之一")
@@ -102,15 +99,8 @@ def validate_commit_message(message: str) -> list[str]:
                 errors.append("summary 不能包含 and / & / multiple changes")
                 break
 
-    for line_no, line in enumerate(body_lines, start=3):
-        stripped = line.strip()
-        if not stripped:
-            continue
-        if not CJK_RE.search(stripped):
-            errors.append(f"正文第 {line_no} 行需使用中文")
-
-    if commit_type == "perf" and not body:
-        errors.append("perf 类型必须提供正文说明优化原因")
+    if "\\n" in message:
+        errors.append(r"提交信息中不要包含字面量 \n")
 
     return errors
 
@@ -123,17 +113,16 @@ def commit_message(message: str) -> int:
         "-c",
         f"user.email={AUTHOR_EMAIL}",
         "commit",
-        "--cleanup=verbatim",
-        "-F",
-        "-",
+        "-m",
+        message,
     ]
-    result = subprocess.run(cmd, input=message, text=True, check=False)
+    result = subprocess.run(cmd, text=True, check=False)
     return result.returncode
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="校验提交信息是否符合 git-commit-helper 规则",
+        description="校验单行提交信息是否符合 git-commit-helper 规则",
     )
     parser.add_argument("--message", help="直接传入提交信息文本")
     parser.add_argument("--file", help="从文件读取提交信息")

@@ -15,7 +15,7 @@
 ## 当前 Skills
 
 - `codex-session-daily-report`
-- `git-commit-helper`
+- `git-commit-helper`：快速生成中文单行提交信息，默认直接提交，不拼接 `\n` 或正文
 
 ## 安装 Skills
 

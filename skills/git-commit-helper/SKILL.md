@@ -1,9 +1,9 @@
 ---
 name: git-commit-helper
-description: "快速生成中文 Git 单行提交信息，固定格式为 type(scope): summary，type 仅允许 feat/fix/refactor/perf/style/test/docs/chore，summary 必须用祈使句、不超过 50 字符、不得以句号结尾且不得包含 and/&/multiple changes。使用该技能于编写提交说明、检查提交文本是否合规，或执行使用 codex (codex-ice@gmail.com) 身份的提交时。"
+description: "快速生成中文 Git 单行提交信息，固定格式为 type(scope): summary，type 仅允许 feat/fix/refactor/perf/style/test/docs/chore，summary 必须用祈使句、不超过 50 字符、不得以句号结尾且不得包含 and/&/multiple changes。使用该技能于编写提交说明、检查提交文本是否合规，或执行 Git 提交时。"
 ---
 
-生成中文单行提交信息。默认直接提交，不编写正文，不把校验脚本当成必经步骤。统一使用作者身份：`codex <codex-ice@gmail.com>`。
+生成中文单行提交信息。默认直接提交，不编写正文，不把校验脚本当成必经步骤。
 
 ## 快路径
 
@@ -13,7 +13,7 @@ description: "快速生成中文 Git 单行提交信息，固定格式为 type(s
 3. 写首行，固定格式：
 `<type>(<scope>): <summary>`
 4. 直接提交：
-`git -c user.name='codex' -c user.email='codex-ice@gmail.com' commit -m "<type>(<scope>): <summary>"`
+`git commit -m "<type>(<scope>): <summary>"`
 5. 不要在 `-m` 参数里拼接 `\n`，也不要补正文；字面量 `\n` 提交后会原样显示。
 
 ## 强制规则

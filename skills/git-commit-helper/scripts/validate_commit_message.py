@@ -34,10 +34,6 @@ PAST_TENSE_PREFIXES = (
 )
 FORBIDDEN_ENDINGS = (".", "。")
 MAX_SUMMARY_LEN = 50
-AUTHOR_NAME = "codex"
-AUTHOR_EMAIL = "codex-ice@gmail.com"
-
-
 def load_message(args: argparse.Namespace) -> str:
     if args.message and args.file:
         raise ValueError("--message 与 --file 只能二选一")
@@ -106,16 +102,7 @@ def validate_commit_message(message: str) -> list[str]:
 
 
 def commit_message(message: str) -> int:
-    cmd = [
-        "git",
-        "-c",
-        f"user.name={AUTHOR_NAME}",
-        "-c",
-        f"user.email={AUTHOR_EMAIL}",
-        "commit",
-        "-m",
-        message,
-    ]
+    cmd = ["git", "commit", "-m", message]
     result = subprocess.run(cmd, text=True, check=False)
     return result.returncode
 
